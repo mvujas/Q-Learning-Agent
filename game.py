@@ -15,6 +15,7 @@ player_color = 'red'
 finish_color = 'green'
 wall_color = 'black'
 sleep_timer = 0.1
+test_timer = 0.5
 
 actions = [
 	[0, -1], # UP
@@ -70,7 +71,9 @@ class Game:
 			if tries >= max_tries:
 				break
 
-		# Test run	
+		# Test run
+		messagebox.showinfo('Game info', 'It\'s time to check how AI performs.')
+		time.sleep(test_timer)
 		self.real_run()
 
 		self.root.destroy()
@@ -130,7 +133,7 @@ class Game:
 	def real_run(self):
 		k = 0
 		self.reset()
-		time.sleep(1)
+		time.sleep(test_timer)
 		while 1:
 			action = list(reversed(sorted(enumerate(self.Q_matrix[self.position[1]][self.position[0]]), key=lambda x: x[1])))[0][0]
 			pos_ch = actions[action]
@@ -142,11 +145,11 @@ class Game:
 			self.change_position(new_pos)
 			if self.position == self.finish:
 				messagebox.showinfo('Game info', 'AI reached finish successfully.')
-				time.sleep(1)
+				time.sleep(test_timer)
 				break
-			time.sleep(1)
+			time.sleep(test_timer)
 			if k >= 2 * (self.table[0] + self.table[1]):
-				messagebox.showinfo('Game info', 'AI encountered infinity.')
+				messagebox.showinfo('Game info', 'AI encountered infinity loop.')
 				break
 
 def main():
