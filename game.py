@@ -34,19 +34,20 @@ class Game:
 			self.finish = (self.table[0] - 1, self.table[1] - 1)
 		self.Q_matrix = [[[0	for _ in range(4)]	for _ in range(self.table[0])]	for _ in range(self.table[1])]
 		self.position = None
-		self.last_position = None		
+		self.last_position = None
+		self.max_tries = max_tries		
 		
 		# Creating visual envirnoment
 		self.walls = []
 		self.root = tk.Tk()
 		self.root.resizable(0, 0) # personal preference
 		self.root.title('Q-Learning AI')
-		self.button = tk.Button(self.root, text='Finish', command=self.finish_choosing)
-		self.canvas = tk.Canvas(self.root, width=2 + self.table[0] * rectangle_size, height=2 + self.table[1] * rectangle_size)
+		self.button = tk.Button(self.root, text='Finish', command=self.finish_choosing_walls)
+		self.canvas = tk.Canvas(self.root, width=3 + self.table[0] * rectangle_size, height=3 + self.table[1] * rectangle_size)
 		self.square = [[None	for _ in range(self.table[0])] for _ in range(self.table[1])]
 		for i in range(0, self.table[1]):
 			for j in range(0, self.table[0]):
-				self.square[i][j] = self.canvas.create_rectangle(2 + i * rectangle_size, 2 + j * rectangle_size, 2 + (i + 1) * rectangle_size, 2 + (j + 1) * rectangle_size)
+				self.square[i][j] = self.canvas.create_rectangle(2 + j * rectangle_size, 2 + i * rectangle_size, 2 + (j + 1) * rectangle_size, 2 + (i + 1) * rectangle_size)
 				self.canvas.tag_bind(self.square[i][j], '<Button-1>', lambda event, x = j, y = i: self.set_wall(event, (x, y)))	
 		self.canvas.pack()
 		self.button.pack()
@@ -56,29 +57,13 @@ class Game:
 		while self.choosing_walls:
 			self.root.update()
 
-		tries = 0	
-		while 1:
-			if self.position == None or self.position == self.finish:
-				self.reset()
-			rand_ch = random.random()
-			if rand_ch < epsilon:
-				action = int(3 * random.random())
-			else:
-				action = list(reversed(sorted(enumerate(self.Q_matrix[self.position[1]][self.position[0]]), key=lambda x: x[1])))[0][0]
-			self.do_action(action)
-			time.sleep(sleep_timer)
-			tries += 1
-			if tries >= max_tries:
-				break
+		self.train()
 
-		# Test run
-		messagebox.showinfo('Game info', 'It\'s time to check how AI performs.')
-		time.sleep(test_timer)
 		self.real_run()
 
 		self.root.destroy()
 
-	def finish_choosing(self):
+	def finish_choosing_walls(self):
 		self.choosing_walls = False
 		self.button.pack_forget()
 
@@ -129,8 +114,26 @@ class Game:
 		else:
 			self.Q_matrix[self.position[1]][self.position[0]][action] += alpha * (r - self.Q_matrix[self.position[1]][self.position[0]][action])
 			self.reset()
+	
+	def train(self):
+		tries = 0	
+		while 1:
+			if self.position == None or self.position == self.finish:
+				self.reset()
+			rand_ch = random.random()
+			if rand_ch < epsilon:
+				action = int(3 * random.random())
+			else:
+				action = list(reversed(sorted(enumerate(self.Q_matrix[self.position[1]][self.position[0]]), key=lambda x: x[1])))[0][0]
+			self.do_action(action)
+			time.sleep(sleep_timer)
+			tries += 1
+			if tries >= self.max_tries:
+				break
 
 	def real_run(self):
+		messagebox.showinfo('Game info', 'It\'s time to check how AI performs.')
+		time.sleep(test_timer)
 		k = 0
 		self.reset()
 		time.sleep(test_timer)
@@ -148,12 +151,13 @@ class Game:
 				time.sleep(test_timer)
 				break
 			time.sleep(test_timer)
+			k += 1
 			if k >= 2 * (self.table[0] + self.table[1]):
 				messagebox.showinfo('Game info', 'AI encountered infinity loop.')
 				break
 
 def main():
-	a = Game(table=(5, 5), max_tries=1000)
+	a = Game(table=(3, 3), max_tries=100)
 	
 if __name__ == "__main__":
 	main()	
