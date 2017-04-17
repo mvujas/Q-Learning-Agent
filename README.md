@@ -13,5 +13,5 @@ Python3 is required to run this application.
 ```bash
 git clone https://github.com/mvujas/Q-Learning-Agent
 cd Q-Learning-Agent/
-python run.py
+python3 run.py
 ```
