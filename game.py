@@ -10,12 +10,15 @@ epsilon = 0.2 # chance to choose random action
 
 # Visual envirnoments parameters
 rectangle_size = 100
-default_color = 'white'
-player_color = 'red'
-finish_color = 'green'
-wall_color = 'black'
 sleep_timer = 0.1
 test_timer = 0.5
+
+def_pallete = {
+	'default': 'white',
+	'player': 'red',
+	'finish': 'green',
+	'walls': 'black'
+}
 
 actions = [
 	[0, -1], # UP
@@ -25,9 +28,10 @@ actions = [
 ]
 
 class Game:
-	def __init__(self, table=(20, 20), spawn=(0, 0), finish=None, max_tries=100):
+	def __init__(self, pallete=def_pallete, table=(20, 20), spawn=(0, 0), finish=None, max_tries=100):
 		self.table = table
 		self.spawn = spawn
+		self.pallete = pallete
 		if finish:
 			self.finish = finish
 		else:
@@ -72,10 +76,10 @@ class Game:
 			return
 		if pos in self.walls:
 			self.walls.remove(pos)
-			col = default_color	
+			col = self.pallete['default']	
 		else:
 			self.walls.append(pos)
-			col = wall_color
+			col = self.pallete['walls']
 		self.canvas.itemconfig(self.square[pos[1]][pos[0]], fill=col)
 
 	def reset(self):
@@ -83,18 +87,18 @@ class Game:
 		self.position = self.spawn
 		for row in self.square:
 			for col in row:
-				self.canvas.itemconfig(col, fill=default_color)
-		self.canvas.itemconfig(self.square[self.spawn[1]][self.spawn[0]], fill=player_color)
-		self.canvas.itemconfig(self.square[self.finish[1]][self.finish[0]], fill=finish_color)
+				self.canvas.itemconfig(col, fill=self.pallete['default'])
+		self.canvas.itemconfig(self.square[self.spawn[1]][self.spawn[0]], fill=self.pallete['player'])
+		self.canvas.itemconfig(self.square[self.finish[1]][self.finish[0]], fill=self.pallete['finish'])
 		for wall in self.walls:
-			self.canvas.itemconfig(self.square[wall[1]][wall[0]], fill=wall_color)
+			self.canvas.itemconfig(self.square[wall[1]][wall[0]], fill=self.pallete['walls'])
 		self.root.update()	
 	
 	def change_position(self, new_pos):
 		self.last_position = self.position
-		self.canvas.itemconfig(self.square[self.last_position[1]][self.last_position[0]], fill=default_color)
+		self.canvas.itemconfig(self.square[self.last_position[1]][self.last_position[0]], fill=self.pallete['default'])
 		self.position = new_pos
-		self.canvas.itemconfig(self.square[self.position[1]][self.position[0]], fill=player_color)
+		self.canvas.itemconfig(self.square[self.position[1]][self.position[0]], fill=self.pallete['player'])
 		self.root.update()
 
 	def reward(self, pos):
@@ -155,9 +159,3 @@ class Game:
 			if k >= 2 * (self.table[0] + self.table[1]):
 				messagebox.showinfo('Game info', 'AI encountered infinity loop.')
 				break
-
-def main():
-	a = Game(table=(3, 3), max_tries=100)
-	
-if __name__ == "__main__":
-	main()	

@@ -15,18 +15,24 @@ class Application:
 
 		tk.Label(self.root, text='Choose width of the table:').pack()
 		self.widthSV = tk.StringVar()
-		self.widthSV.trace("w", lambda name, index, mode, sv=self.widthSV: self.entry_callback(sv))
+		self.widthSV.trace("w", lambda name, index, mode, sv=self.widthSV: self.entry_callback(sv, 2))
 		self.widthB = tk.Entry(self.root, width=2, textvariable=self.widthSV)
 		self.widthB.insert(0, '5')
 		self.widthB.pack()
 
 		tk.Label(self.root, text='Choose height of the table:').pack()
 		self.heightSV = tk.StringVar()
-		self.heightSV.trace("w", lambda name, index, mode, sv=self.heightSV: self.entry_callback(sv))
+		self.heightSV.trace("w", lambda name, index, mode, sv=self.heightSV: self.entry_callback(sv, 2))
 		self.heightB = tk.Entry(self.root, width=2, textvariable=self.heightSV)
 		self.heightB.insert(0, '5')
 		self.heightB.pack()
 
+		tk.Label(self.root, text='Choose number of training epochs:').pack()
+		self.epochSV = tk.StringVar()
+		self.epochSV.trace("w", lambda name, index, mode, sv=self.epochSV: self.entry_callback(sv, 6))
+		self.epochB = tk.Entry(self.root, width=6, textvariable=self.epochSV)
+		self.epochB.insert(0, '100')
+		self.epochB.pack()
 
 		self.canvas = [None for _ in range(4)]
 		self.col = {}
@@ -44,8 +50,8 @@ class Application:
 		
 		self.root.mainloop()
 
-	def entry_callback(self, StrVar):
-		StrVar.set(StrVar.get()[:2])
+	def entry_callback(self, StrVar, k):
+		StrVar.set(StrVar.get()[:k])
 		
 	def quit(self, _):
 		self.root.destroy()
@@ -59,5 +65,7 @@ class Application:
 	def get_info(self):
 		return {
 			'pallete': self.pallete,
-			'table': (int(self.widthSV.get()) if self.widthSV.get().isdigit() else 5, int(self.heightSV.get()) if self.heightSV.get().isdigit() else 5)	
+			'table': (int(self.widthSV.get()) if self.widthSV.get().isdigit() else 5, int(self.heightSV.get()) if self.heightSV.get().isdigit() else 5),
+			'epochs': int(self.epochSV.get()) if self.epochSV.get().isdigit() else 100	
+		
 		}
